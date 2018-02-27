@@ -3,6 +3,24 @@
 require_once 'uimods.civix.php';
 use CRM_Uimods_ExtensionUtil as E;
 
+function uimods_civicrm_pageRun(&$page) {
+  $pageName = $page->getVar('_name');
+  switch ($pageName) {
+    case 'CRM_Contribute_Page_Tab':
+      try {
+        $language = civicrm_api3('Setting', 'getvalue', array('name' => "lcMessages"));
+        $validLanguages = array('nl_NL', 'en_GB', 'en_US', 'en_AU', 'en_CA', 'fr_FR', 'fr_CA');
+        if (in_array($language, $validLanguages)) {
+          CRM_Core_Region::instance('page-body')->add(array('template' => 'replaceContributionPage.tpl'));
+        }
+      }
+      catch (CiviCRM_API3_Exception $ex) {
+        CRM_Core_Error::debug_log_message(ts('Could not load the specific vluchtelingenwerk contribution page - unable to retrieve setting lcMessages'));
+      }
+      break;
+  }
+}
+
 /**
  * Implements hook_civicrm_config().
  *
